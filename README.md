@@ -9,3 +9,10 @@ String tersebut merupakan URL koneksi yang digunakan oleh aplikasi untuk terhubu
 - `guest` kedua adalah *password* *default* untuk *username* tersebut.
 - `localhost` menandakan bahwa server RabbitMQ berjalan di komputer lokal (mesin yang sama dengan yang menjalankan kode ini).
 - `5672` adalah *port* *default* yang didengarkan (listen) oleh RabbitMQ untuk menerima koneksi jaringan berprotokol AMQP.
+
+## Queued Graph with Three Subscribers
+![RabbitMQ Three Subscribers](images/Queued_Three_Subscribers.png)
+Dengan menjalankan 3 *subscriber* secara bersamaan, lonjakan antrean menurun jauh lebih cepat dibandingkan saat hanya menggunakan 1 *subscriber*. Ini terjadi karena sistem sekarang menerapkan prinsip *load balancing*, di mana beban pemrosesan pesan dibagi secara merata kepada 3 *worker* (*subscriber*) yang berjalan serentak. Meskipun masing-masing *subscriber* memiliki *delay* lambat selama 1 detik per pesan, secara kolektif sistem kini dapat memproses 3 pesan sekaligus per detiknya.
+
+## Reflection
+Melihat kode saat ini, penggunaan `thread::sleep` untuk simulasi *delay* kurang ideal karena memblokir *thread*. Karena *project* ini menggunakan `tokio`, lebih baik menggunakan `tokio::time::sleep` yang bersifat *asynchronous* (non-blocking). Selain itu, data pada *publisher* saat ini masih di-*hardcode*, alangkah baiknya jika dibuat dinamis menerima *input* parameter.
